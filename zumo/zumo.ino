@@ -21,40 +21,53 @@ ZumoMotors motors;
 Pushbutton button(ZUMO_BUTTON);
 LSM303 compass;
 boolean is_running = false;
+unsigned long time;
 
 // Setup will calibrate our compass by finding maximum/minimum magnetic readings
 void setup(){
 	buzzer.play(">g32>>c32"); // Play a little welcome song
 
-	COMPASS_calibrate();
-	// ROTATION_calibrate();
+	// COMPASS_calibrate();
 
 	// Play music and wait for it to finish before we start driving.
 	buzzer.play(">g32>>c32");
 	while(buzzer.isPlaying());
+
+	Serial.begin(9600);
 }
 
+int time_start = 0;
+int timer = 0;
 void loop(){
+	time = millis();
+	timer++;
+
 	if(is_running){
+
+		// turn 90 degrees and forward !
+		// motors.setSpeeds(-200, 200);
+		motors.setSpeeds(- SPEED*.3 + sin(timer *.5)*SPEED*.7,- SPEED*.3 + cos(timer *.5)*SPEED*.7 );
+		if(time >= time_start + 10000) is_running = false;
+
 		// Heading is given in degrees away from the magnetic vector, increasing clockwise
-		float heading = averageHeading();
+		// float heading = averageHeading();
 
-		int direction = (heading > 180) ? 1 : -1;
-		motors.setSpeeds(direction*SPEED, -direction*SPEED);
+		// int direction = (heading > 180) ? 1 : -1;
+		// motors.setSpeeds(direction*SPEED, -direction*SPEED);
 
-		if(heading >= -ANGLE_INTERVAL*.5 && heading <= ANGLE_INTERVAL*.5){
-			buzzer.play("L16 cdegreg4");
-			motors.setSpeeds(400, 400);
-			while(buzzer.isPlaying());
+		// if(heading >= -ANGLE_INTERVAL*.5 && heading <= ANGLE_INTERVAL*.5){
+		// 	buzzer.play("L16 cdegreg4");
+		// 	motors.setSpeeds(400, 400);
+		// 	while(buzzer.isPlaying());
 
-			// randomize function
-			motors.setSpeeds(-400, 400);
-			delay(random(200, 1000));
-			motors.setSpeeds(400, 400);
-			delay(300);
+		// 	// randomize function
+		// 	motors.setSpeeds(-400, 400);
+		// 	delay(random(200, 1000));
+		// 	motors.setSpeeds(400, 400);
+		// 	delay(300);
 
-			is_running = false;
-		}
+		// 	is_running = false;
+		// }
 	}else{
 		// arrête toi !
 		motors.setSpeeds(0, 0);
@@ -62,8 +75,9 @@ void loop(){
 		button.waitForButton();
 		buzzer.play(">g32>>c32");
 		is_running = true;
+		time_start = millis();
 	}
-
+	delay(100);
 }
 
 

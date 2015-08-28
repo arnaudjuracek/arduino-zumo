@@ -1,4 +1,4 @@
-void COMPASS_calibrate(){
+int COMPASS_calibrate(){
 	// The highest possible magnetic value to read in any direction is 2047
 	// The lowest possible magnetic value to read in any direction is -2047
 	LSM303::vector<int16_t> running_min = {32767, 32767, 32767}, running_max = {-32767, -32767, -32767};
@@ -13,12 +13,11 @@ void COMPASS_calibrate(){
 
 	button.waitForButton();
 
-
 	// To calibrate the magnetometer, the Zumo spins to find the max/min
 	// magnetic vectors. This information is used to correct for offsets
 	// in the magnetometer data.
-	motors.setLeftSpeed(SPEED*.5);
-	motors.setRightSpeed(-SPEED*.5);
+	motors.setLeftSpeed(200);
+	motors.setRightSpeed(-200);
 
 	for(index = 0; index < CALIBRATION_SAMPLES; index ++){
 		// Take a reading of the magnetic vector and store it in compass.m
